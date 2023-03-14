@@ -1,6 +1,6 @@
 # Práctica SW2
 
-## *Miembros de la empresa:*
+## *Miembros del Grupo:*
 - Pablo Muñoz
 - David Gilarranz
 - Gonzalo Álvarez 
