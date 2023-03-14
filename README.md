@@ -8,4 +8,4 @@
 
 
 ## Temática
-- Scrapper de pastes 
+- Scrapper de pastes(pastebin)
