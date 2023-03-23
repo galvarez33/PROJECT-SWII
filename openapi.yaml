@@ -1,0 +1,156 @@
+openapi: 3.1.0
+info: 
+  title: Scrapify
+  version: 0.0.1
+  description: API para el servicio de scraping de Pastebin
+paths: 
+  /recursos: 
+    get: 
+      summary: Lista los recursos disponibles
+      description: Obtiene todos los recursos que pueden ser consultados por el usuario
+      responses: 
+        "200": 
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                required:
+                  - id
+                  - descripcion
+                properties: 
+                  id: 
+                    type: string
+                    description: Id del recurso
+                  descripcion: 
+                    type: string
+                    description: Descripción del recurso
+        "204": 
+          description: No content
+    post:
+      summary: Añade un recurso
+      description: Añade un recurso a la lista de recursos disponibles
+      requestBody:
+        content:
+          schema: 
+            type: object
+            required:
+              - id
+              - descripcion
+            properties: 
+              id: 
+                type: string
+                description: Id del recurso
+              descripcion: 
+                type: string
+                description: Descripción del recurso
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              type: object
+              required: 
+                - id
+              properties:
+                id:
+                  type: string
+                  description: Id del recurso creado
+        "400":
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - Formato incorrecto
+                  - El id proporcionado ya existe
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: Esta operación requiere autentificación
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: No se dispone de los permisos necesarios para realizar esta operación
+  recursos/{id}:
+    put:
+      summary: Modifica un recurso
+      description: Modifica un recurso de la lista de recursos disponibles
+      parameters:
+        - name: id
+          in: path
+          required: true
+      requestBody:
+        content:
+          schema: 
+            type: object
+            required:
+              - descripcion
+            properties: 
+              descripcion: 
+                type: string
+                description: Nueva descripción para el recurso
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - Formato incorrecto
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: Esta operación requiere autentificación
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: No se dispone de los permisos necesarios para realizar esta operación
+    delete/{id}:
+      summary: Borra un recurso
+      description: Borra un recurso de la lista de recursos disponibles
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: Esta operación requiere autentificación
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                type: string
+                const: No se dispone de los permisos necesarios para realizar esta operación
+        "404":
+          description: Not found 
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - El recurso solicitado no existe
