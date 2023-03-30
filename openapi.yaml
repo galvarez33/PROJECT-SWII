@@ -14,143 +14,266 @@ paths:
           content: 
             application/json: 
               schema: 
-                type: object
-                required:
-                  - id
-                  - descripcion
-                properties: 
-                  id: 
-                    type: string
-                    description: Id del recurso
-                  descripcion: 
-                    type: string
-                    description: Descripción del recurso
+                $ref: "#/components/schemas/Respuesta200"
         "204": 
           description: No content
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Respuesta204"
     post:
       summary: Añade un recurso
       description: Añade un recurso a la lista de recursos disponibles
       requestBody:
         content:
           schema: 
-            type: object
-            required:
-              - id
-              - descripcion
-            properties: 
-              id: 
-                type: string
-                description: Id del recurso
-              descripcion: 
-                type: string
-                description: Descripción del recurso
+            $ref: "#/components/schemas/Recurso"
       responses:
         "201":
           description: Created
           content:
             application/json:
-              type: object
-              required: 
-                - id
-              properties:
-                id:
-                  type: string
-                  description: Id del recurso creado
+              schema:
+                $ref: "#/components/schema/Respuesta201"
         "400":
           description: Bad request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                enum:
-                  - Formato incorrecto
-                  - El id proporcionado ya existe
+                $ref: "#/components/schema/Respuesta400"
         "401":
           description: Unauthorized
           content:
             text/plain:
               schema:
-                type: string
-                const: Esta operación requiere autentificación
+                $ref: "#/components/schema/Respuesta401"
         "403":
           description: Forbidden
           content:
             text/plain:
               schema:
-                type: string
-                const: No se dispone de los permisos necesarios para realizar esta operación
+                $ref: "#/components/schema/Respuesta403"
   recursos/{id}:
+    parameters:
+      - $ref: "#/parameters/id"
     put:
       summary: Modifica un recurso
       description: Modifica un recurso de la lista de recursos disponibles
       parameters:
-        - name: id
-          in: path
-          required: true
+        - $ref: "#/parameters/id"
       requestBody:
         content:
           schema: 
-            type: object
-            required:
-              - descripcion
-            properties: 
-              descripcion: 
-                type: string
-                description: Nueva descripción para el recurso
+            $ref: "#/components/schema/RecursoPUT"
       responses:
         "200":
           description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Respuesta200"
         "400":
           description: Bad request
           content:
             text/plain:
               schema:
-                type: string
-                enum:
-                  - Formato incorrecto
+                $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
             text/plain:
               schema:
-                type: string
-                const: Esta operación requiere autentificación
+                $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
             text/plain:
               schema:
-                type: string
-                const: No se dispone de los permisos necesarios para realizar esta operación
-    delete/{id}:
+                $ref: "#/components/schemas/Respuesta403"
+    delete:
       summary: Borra un recurso
       description: Borra un recurso de la lista de recursos disponibles
-      parameters:
-        - name: id
-          in: path
-          required: true
       responses:
         "200":
           description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Respuesta200"
+        "400":
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
             text/plain:
               schema:
-                type: string
-                const: Esta operación requiere autentificación
+                $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
             text/plain:
               schema:
-                type: string
-                const: No se dispone de los permisos necesarios para realizar esta operación
+                $ref: "#/components/schemas/Respuesta403"
         "404":
-          description: Not found 
+          description: Forbidden
           content:
             text/plain:
               schema:
-                type: string
-                enum:
-                  - El recurso solicitado no existe
+                $ref: "#/components/schemas/Respuesta404"
+  recursos/{id}/{id}:
+    parameters:
+      - $ref: "#/parameters/id"
+    get:
+      summary: Obtiene un activo específico.
+      description: Obtiene un activo específico del recurso genérico.
+      responses: 
+        "200": 
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Activo"
+        "404":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta404"
+    post:
+      summary: Crea una entrada específica para el recurso genérico.
+      description: Añade un activo específico al recurso genérico.
+      requestBody:
+        content:
+          schema: 
+            $ref: "#/components/schemas/Activo"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schema/Respuesta201"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schema/Respuesta400"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schema/Respuesta401"
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schema/Respuesta403"
+    put:
+      summary: Modifica un activo 
+      description: Modifica un activo específico del recurso genérico.
+      parameters:
+        - $ref: "#/parameters/id"
+      requestBody:
+        content:
+          schema: 
+            $ref: "#/components/schema/ActivoPUT"
+      responses:
+        "200":
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Respuesta200"
+        "400":
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta400"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta401"
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta403"
+    delete:
+      summary: Borra un recurso
+      description: Borra un recurso de la lista de recursos disponibles
+      responses:
+        "200":
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Respuesta200"
+        "400":
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta400"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta401"
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta403"
+        "404":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Respuesta404"
+components:
+  schemas:
+    Respuesta201:
+      type: object
+      required: 
+        - id
+      properties:
+        id:
+          type: string
+          description: Id del recurso creado
+    Respuesta400:
+      type: string
+      enum:
+        - Formato incorrecto
+        - El id proporcionado ya existe
+    Respuesta401:
+      type: string
+      const: Esta operación requiere autentificación
+    Respuesta403:
+      type: string
+      const: No se dispone de los permisos necesarios para realizar esta operación
+    RecursoPUT:
+      type: object
+      required:
+        - descripcion
+      properties: 
+        descripcion: 
+          type: string
+          description: Nueva descripción para el recurso
+parameters:
+  id:
+    name: id
+    in: path
+    required: true
