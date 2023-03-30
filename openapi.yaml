@@ -14,7 +14,7 @@ paths:
           content: 
             application/json: 
               schema: 
-                $ref: "#/components/schemas/Respuesta200"
+                $ref: "#/components/schemas/Recursos"
         "204": 
           description: No content
           content: 
@@ -53,7 +53,7 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schema/Respuesta403"
-  recursos/{id}:
+  /recursos/{id}:
     parameters:
       - $ref: "#/parameters/id"
     put:
@@ -124,7 +124,7 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
-  recursos/{id}/{id}:
+  /recursos/{id}/{id}:
     parameters:
       - $ref: "#/parameters/id"
     get:
@@ -253,6 +253,9 @@ components:
         id:
           type: string
           description: Id del recurso creado
+    Respuesta204:
+      type: string
+      const: No hay contenido
     Respuesta400:
       type: string
       enum:
@@ -264,6 +267,22 @@ components:
     Respuesta403:
       type: string
       const: No se dispone de los permisos necesarios para realizar esta operación
+    Recursos:
+      type: array
+      items:
+        - $ref: "#/components/schema/Recurso"
+    Recurso:
+      type: object
+      required:
+        - id
+        - descripcion
+      properties: 
+        id: 
+          type: string
+          description: Id del recurso
+        descripcion: 
+          type: string
+          description: Descripción del recurso
     RecursoPUT:
       type: object
       required:
