@@ -26,33 +26,34 @@ paths:
       description: Añade un recurso a la lista de recursos disponibles
       requestBody:
         content:
-          schema: 
-            $ref: "#/components/schemas/Recurso"
+          application/json: 
+            schema: 
+              $ref: "#/components/schemas/Recurso"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schema/Respuesta201"
+                $ref: "#/components/schemas/Respuesta201"
         "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schema/Respuesta400"
+                $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                $ref: "#/components/schema/Respuesta401"
+                $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json: 
               schema:
-                $ref: "#/components/schema/Respuesta403"
+                $ref: "#/components/schemas/Respuesta403"
   /recursos/{id}:
     parameters:
       - $ref: "#/parameters/id"
@@ -63,8 +64,9 @@ paths:
         - $ref: "#/parameters/id"
       requestBody:
         content:
-          schema: 
-            $ref: "#/components/schema/RecursoPUT"
+          application/json: 
+            schema: 
+            $ref: "#/components/schemas/RecursoPUT"
       responses:
         "200":
           description: OK
@@ -75,19 +77,19 @@ paths:
         "400":
           description: Bad request
           content:
-            text/plain:
+            application/json: 
               schema:
                 $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json: 
               schema:
                 $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json: 
               schema:
                 $ref: "#/components/schemas/Respuesta403"
     delete:
@@ -103,25 +105,25 @@ paths:
         "400":
           description: Bad request
           content:
-            text/plain:
+            application/json: 
               schema:
                 $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta403"
         "404":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
   /recursos/{id}/{id}:
@@ -140,7 +142,7 @@ paths:
         "404":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
     post:
@@ -148,33 +150,34 @@ paths:
       description: Añade un activo específico al recurso genérico.
       requestBody:
         content:
-          schema: 
-            $ref: "#/components/schemas/Activo"
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Activo"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schema/Respuesta201"
+                $ref: "#/components/schemas/Respuesta201"
         "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: "#/components/schema/Respuesta400"
+                $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                $ref: "#/components/schema/Respuesta401"
+                $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
-                $ref: "#/components/schema/Respuesta403"
+                $ref: "#/components/schemas/Respuesta403"
     put:
       summary: Modifica un activo 
       description: Modifica un activo específico del recurso genérico.
@@ -183,7 +186,7 @@ paths:
       requestBody:
         content:
           schema: 
-            $ref: "#/components/schema/ActivoPUT"
+            $ref: "#/components/schemas/ActivoPUT"
       responses:
         "200":
           description: OK
@@ -194,19 +197,19 @@ paths:
         "400":
           description: Bad request
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta403"
     delete:
@@ -222,29 +225,32 @@ paths:
         "400":
           description: Bad request
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta400"
         "401":
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta401"
         "403":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta403"
         "404":
           description: Forbidden
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
 components:
   schemas:
+    Respuesta200:
+      type: string
+      const: Todo correcto
     Respuesta201:
       type: object
       required: 
@@ -267,10 +273,13 @@ components:
     Respuesta403:
       type: string
       const: No se dispone de los permisos necesarios para realizar esta operación
+    Respuesta404:
+      type: string
+      const: El recurso {id} no existe
     Recursos:
       type: array
       items:
-        - $ref: "#/components/schema/Recurso"
+        - $ref: "#/components/schemas/Recurso"
     Recurso:
       type: object
       required:
