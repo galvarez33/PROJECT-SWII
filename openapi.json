@@ -1,0 +1,47 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Scrapify",
+    "version": "0.0.1",
+    "description": "API para el servicio de scraping de Pastebin"
+  },
+  "paths": {
+    "/recursos": {
+      "get": {
+        "summary": "Lista los recursos disponibles",
+        "description": "Obtiene todos los recursos que pueden ser consultados por el usuario",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "descripcion"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Id del recurso"
+                    },
+                    "descripcion": {
+                      "type": "string",
+                      "description": "Descripcion del recurso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No content",
+            "content": {
+              "text/plain": {
+                
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
