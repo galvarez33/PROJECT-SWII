@@ -147,12 +147,19 @@ paths:
             application/json: 
               schema: 
                 $ref: "#/components/schemas/Activo"
+              example:
+                id: "ejemplo@gmail.com"
+                ocurrencias:
+                  - timestamp: "12/03/2024"
+                    source: "www.ejemplo.com"
+              
         "404":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
+              example: "El recurso ejemplo@gmail.com no existe"
     post:
       summary: Crea una entrada específica para el recurso genérico.
       description: Añade un activo específico al recurso genérico.
@@ -168,6 +175,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta201"
+              example:
+               id: "ejemplo@gmail.com"
+               
         "400":
           description: Bad request
           content:
@@ -253,6 +263,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
+              example: "El recurso ejemplo@gmail.com no existe"
+              
 components:
   parameters:
     id:
