@@ -169,6 +169,13 @@ paths:
           application/json:
             schema: 
               $ref: "#/components/schemas/Activo"
+            example:
+              id: "657894532"
+              ocurrencias:
+                - timestamp: "02/03/2022"
+                  source: "www.ejemplo.es"
+              
+            
       responses:
         "201":
           description: Created
@@ -205,6 +212,12 @@ paths:
           application/json:
             schema: 
               $ref: "#/components/schemas/ActivoPUT"
+            example:
+              ocurrencia:
+                timestamp: "02/05/2019"
+                source: "https://www.ejemplo.network"
+              
+              
       responses:
         "200":
           description: OK
