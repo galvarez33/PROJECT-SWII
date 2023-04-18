@@ -62,9 +62,9 @@ paths:
             application/json: 
               schema:
                 $ref: "#/components/schemas/Respuesta403"
-  /recursos/{id}:
+  /recursos/{idRecurso}:
     parameters:
-      - $ref: "#/components/parameters/id"
+      - $ref: "#/components/parameters/idRecurso"
     put:
       summary: Modifica un recurso
       description: Modifica un recurso de la lista de recursos disponibles
@@ -134,9 +134,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
-  /recursos/{id}/{id}:
+  /recursos/{idRecurso}/{idActivo}:
     parameters:
-      - $ref: "#/components/parameters/id"
+      - $ref: "#/components/parameters/idRecurso"
+      - $ref: "#/components/parameters/idActivo"
     get:
       summary: Obtiene un activo específico.
       description: Obtiene un activo específico del recurso genérico.
@@ -267,8 +268,14 @@ paths:
               
 components:
   parameters:
-    id:
-      name: id
+    idRecurso:
+      name: idRecurso
+      in: path
+      required: true
+      schema:
+        type: string
+    idActivo:
+      name: idActivo
       in: path
       required: true
       schema:
