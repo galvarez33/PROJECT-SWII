@@ -12,7 +12,7 @@ class Matcher {
    */
   getMatches(document) {
     const matches = this.parseDocument(document);
-    return filterMatches(matches)
+    return this.filterMatches(matches)
   }
 
   /**
@@ -50,6 +50,8 @@ class Matcher {
         uniqueMatches.push(match)
       }
     });
+
+    return uniqueMatches;
   }
 };
 
@@ -66,12 +68,50 @@ class URLMatcher extends Matcher {
    * @returns {Array<string>} Array of matches.
    */
   parseDocument(document) {
-    const urlRegex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
-    return document.matchAll(urlRegex).map(match => match[0]);
+    const regex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/g;
+    return [...document.matchAll(regex)].map(match => match[0]);
+  }
+}
+
+/**
+ * Email Matcher.
+ * 
+ * @extends Matcher
+ */
+class EmailMatcher extends Matcher {
+  /**
+   * Method to extract matches from a document.
+   * 
+   * @param {string} document Document to be parsed.
+   * @returns {Array<string>} Array of matches.
+   */
+  parseDocument(document) {
+    const regex = /[\w-\.]+@([\w-]+\.)+[\w-]{2,4}/g;
+    return [...document.matchAll(regex)].map(match => match[0]);
+  }
+}
+
+/**
+ * Phone Matcher
+ * 
+ * @extends Matcher
+ */
+class PhoneMatcher extends Matcher {
+  /**
+   * Method to extract matches from a document.
+   * 
+   * @param {string} document Document to be parsed.
+   * @returns {Array<string>} Array of matches.
+   */
+  parseDocument(document) {
+    const regex = /(?:\+\(\d{1,3}?\)?)?[ ]?\d{6,13}/g;
+    return [...document.matchAll(regex)].map(match => match[0]);
   }
 }
 
 module.exports = {
   Matcher,
-  URLMatcher
+  URLMatcher,
+  EmailMatcher,
+  PhoneMatcher
 };
