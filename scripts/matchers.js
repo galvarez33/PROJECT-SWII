@@ -104,7 +104,7 @@ class PhoneMatcher extends Matcher {
    * @returns {Array<string>} Array of matches.
    */
   parseDocument(document) {
-    const regex = /(?:\+\(\d{1,3}?\)?)?[ ]?\d{6,13}/g;
+    const regex = /(?:\+\(?\d{1,3}\)?)?[ ]?\d{6,13}/g
     return [...document.matchAll(regex)].map(match => match[0]);
   }
 }
