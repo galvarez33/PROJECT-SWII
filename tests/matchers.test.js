@@ -9,4 +9,8 @@ describe("URLMatcher Tests", () => {
   it("http URL Matcher Test", () => {
     expect(urlMatcher.parseDocument("http://www.google.es")).toEqual(["http://www.google.es"])
   })
+
+  it("https URL Matcher Test", () => {
+    expect(urlMatcher.parseDocument("https://www.google.es")).toEqual(["https://www.google.es"])
+  })
 });
