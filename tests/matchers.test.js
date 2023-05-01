@@ -17,4 +17,8 @@ describe("URLMatcher Tests", () => {
   it("Long text with URL inside", () => {
     expect(urlMatcher.parseDocument("hola buenos dias que tal va todo https://www.google.es ")).toEqual(["https://www.google.es"])
   })
+
+  it("Long text with many URLs inside", () => {
+    expect(urlMatcher.parseDocument("hola buenos dias que tal va todo https://www.google.es es un grand dia hoy http://www.google.es")).toEqual(["https://www.google.es","http://www.google.es",])
+  })
 });
