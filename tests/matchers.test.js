@@ -1,16 +1,12 @@
-const {Matcher} = require("../scripts/matchers")
+const {URLMatcher, EmailMatcher, PhoneMatcher} = require("../scripts/matchers");
 
-describe("Matcher", () => {
-  describe("parseDocument()", () => {
-    it("is abstract method", () => {
-      expect(() => {
-        const matcher = new Matcher();
-        matcher.parseDocument();
-      }).toThrow("NotImplementedError")
-    });
-  });
+describe("URLMatcher Tests", () => {
+  const urlMatcher = new URLMatcher();
+  it("Simple URL Matcher Test", () => {
+    expect(urlMatcher.parseDocument("www.google.es")).toEqual([])
+  })
 
-  describe("getMatches()", () => {
-
-  });
+  it("http URL Matcher Test", () => {
+    expect(urlMatcher.parseDocument("http://www.google.es")).toEqual(["http://www.google.es"])
+  })
 });
