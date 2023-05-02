@@ -41,4 +41,8 @@ describe("EmailMatcher Tests", () => {
     expect(emailMatcher.parseDocument("Hola buenos dias que tal soy test@gmail.com y mi compañero es test2@gmail.com")).toEqual(["test@gmail.com", "test2@gmail.com"])
   })
 
+  it("Lots of email using different types Matcher test", () => {
+    expect(emailMatcher.parseDocument("test@gmail.com y mi compañero es test2@gmail.com y mi amigo es t@marc.com y su amigo es marca@marca.com")).toEqual(["test@gmail.com", "test2@gmail.com", "t@marc.com", "marca@marca.com"])
+  })
+
 });
