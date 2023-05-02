@@ -22,3 +22,11 @@ describe("URLMatcher Tests", () => {
     expect(urlMatcher.parseDocument("hola buenos dias que tal va todo https://www.google.es es un grand dia hoy http://www.google.es")).toEqual(["https://www.google.es","http://www.google.es",])
   })
 });
+
+describe("EmailMatcher Tests", () => {
+  const emailMatcher = new EmailMatcher();
+  it("Simple email Matcher Test", () => {
+    expect(emailMatcher.parseDocument("test@gmail.com")).toEqual(["test@gmail.com"])
+  })
+
+});
