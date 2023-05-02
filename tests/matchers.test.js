@@ -29,4 +29,8 @@ describe("EmailMatcher Tests", () => {
     expect(emailMatcher.parseDocument("test@gmail.com")).toEqual(["test@gmail.com"])
   })
 
+  it("Strange email Matcher Test", () => {
+    expect(emailMatcher.parseDocument("test@marca.com")).toEqual(["test@marca.com"])
+  })
+
 });
