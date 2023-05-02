@@ -33,4 +33,8 @@ describe("EmailMatcher Tests", () => {
     expect(emailMatcher.parseDocument("test@marca.com")).toEqual(["test@marca.com"])
   })
 
+  it("Long text email Matcher Test", () => {
+    expect(emailMatcher.parseDocument("Hola buenos dias que tal soy test@gmail.com")).toEqual(["test@gmail.com"])
+  })
+
 });
