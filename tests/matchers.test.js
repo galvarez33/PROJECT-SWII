@@ -68,5 +68,10 @@ describe("PhoneMatcher Tests", () => {
     expect(phoneMatcher.parseDocument("123 456 789")).toEqual([])
   })
 
+  it("Many phones text Matcher Test", () => {
+    const phoneMatcher = new PhoneMatcher();
+    expect(phoneMatcher.parseDocument("hola soy 123456789 y mi amigo es el +34987654321")).toEqual([" 123456789", "+34987654321"])
+  })
+
 
 });
