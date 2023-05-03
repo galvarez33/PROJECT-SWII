@@ -58,5 +58,10 @@ describe("PhoneMatcher Tests", () => {
     expect(phoneMatcher.parseDocument("+34 123 456 789")).toEqual([])
   })
 
+  it("Simple phone without mobile prefix Matcher Test", () => {
+    const phoneMatcher = new PhoneMatcher();
+    expect(phoneMatcher.parseDocument("123456789")).toEqual(["123456789"])
+  })
+
 
 });
