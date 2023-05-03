@@ -46,3 +46,17 @@ describe("EmailMatcher Tests", () => {
   })
 
 });
+
+describe("PhoneMatcher Tests", () => {
+  it("Simple phone Matcher Test", () => {
+    const phoneMatcher = new PhoneMatcher();
+    expect(phoneMatcher.parseDocument("+34123456789")).toEqual(["+34123456789"])
+  })
+
+  it("Simple phone with spaces Matcher Test", () => {
+    const phoneMatcher = new PhoneMatcher();
+    expect(phoneMatcher.parseDocument("+34 123 456 789")).toEqual([])
+  })
+
+
+});
