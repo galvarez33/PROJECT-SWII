@@ -73,5 +73,4 @@ describe("PhoneMatcher Tests", () => {
     expect(phoneMatcher.parseDocument("hola soy 123456789 y mi amigo es el +34987654321")).toEqual([" 123456789", "+34987654321"])
   })
 
-
 });
