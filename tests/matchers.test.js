@@ -63,5 +63,10 @@ describe("PhoneMatcher Tests", () => {
     expect(phoneMatcher.parseDocument("123456789")).toEqual(["123456789"])
   })
 
+  it("Simple phone with spaces and without mobile prefix Matcher Test", () => {
+    const phoneMatcher = new PhoneMatcher();
+    expect(phoneMatcher.parseDocument("123 456 789")).toEqual([])
+  })
+
 
 });
