@@ -1,24 +1,28 @@
 const {URLMatcher, EmailMatcher, PhoneMatcher} = require("../scripts/matchers");
 
 describe("URLMatcher Tests", () => {
-  const urlMatcher = new URLMatcher();
   it("Simple URL Matcher Test", () => {
+    const urlMatcher = new URLMatcher();
     expect(urlMatcher.parseDocument("www.google.es")).toEqual([])
   })
 
   it("http URL Matcher Test", () => {
+    const urlMatcher = new URLMatcher();
     expect(urlMatcher.parseDocument("http://www.google.es")).toEqual(["http://www.google.es"])
   })
 
   it("https URL Matcher Test", () => {
+    const urlMatcher = new URLMatcher();
     expect(urlMatcher.parseDocument("https://www.google.es")).toEqual(["https://www.google.es"])
   })
 
   it("Long text with URL inside", () => {
+    const urlMatcher = new URLMatcher();
     expect(urlMatcher.parseDocument("hola buenos dias que tal va todo https://www.google.es ")).toEqual(["https://www.google.es"])
   })
 
   it("Long text with many URLs inside", () => {
+    const urlMatcher = new URLMatcher();
     expect(urlMatcher.parseDocument("hola buenos dias que tal va todo https://www.google.es es un grand dia hoy http://www.google.es")).toEqual(["https://www.google.es","http://www.google.es",])
   })
 });
@@ -70,7 +74,7 @@ describe("PhoneMatcher Tests", () => {
 
   it("Many phones text Matcher Test", () => {
     const phoneMatcher = new PhoneMatcher();
-    expect(phoneMatcher.parseDocument("hola soy 123456789 y mi amigo es el +34987654321")).toEqual([" 123456789", "+34987654321"])
+    expect(phoneMatcher.parseDocument("hola soy 123456789 y mi amigo es el +34987654321")).toEqual(["123456789", "+34987654321"])
   })
 
 });

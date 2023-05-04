@@ -105,7 +105,7 @@ class PhoneMatcher extends Matcher {
    */
   parseDocument(document) {
     const regex = /(?:\+\(?\d{1,3}\)?)?[ ]?\d{6,13}/g
-    return [...document.matchAll(regex)].map(match => match[0]);
+    return [...document.matchAll(regex)].map(match => match[0].trim());
   }
 }
 
