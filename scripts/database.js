@@ -1,15 +1,17 @@
+require('dotenv').config();
+
 const { MongoClient } = require('mongodb');
 
 /**
  * Class to manage database access.
  */
 const Database = class {
-  constructor() {
-    this.conn = null;
+  constructor(uri) {
+    this.conn = new MongoClient(uri);
   }
 
   async initializeDatabase() {
-    conn = await MongoClient.connect(process.env.MONGO_URI);
+    this.conn = await this.conn.connect(process.env.MONGO_URI);
   }
 
   getDatabase() {
@@ -17,6 +19,7 @@ const Database = class {
   }
 };
 
+
 module.exports = {
-  initializeConnection
+  Database
 }
