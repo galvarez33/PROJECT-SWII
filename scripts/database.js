@@ -3,22 +3,40 @@ require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
 /**
- * Class to manage database access.
+ * Private class to implement Singleton Pattern.
  */
-const Database = class {
+class PrivateDatabase {
   constructor(uri) {
-    this.conn = new MongoClient(uri);
+    this.uri = uri
+    this.client = new MongoClient(uri);
   }
 
   async initializeDatabase() {
-    this.conn = await this.conn.connect(process.env.MONGO_URI);
+    await this.client.connect(this.uri);
   }
 
   getDatabase() {
-    return this.conn;
+    return this.client;
   }
 };
 
+/**
+ * Class to manage database access.
+ */
+class Database {
+  constructor() {
+    throw new Error("Use Database.getInstance()");
+  }
+
+  static getInstance() {
+    if(!Database.instance) {
+      const uri = process.env.MONGO_URI;
+      Database.instance = new PrivateDatabase(uri)
+    }
+
+    return Database.instance
+  }
+};
 
 module.exports = {
   Database
