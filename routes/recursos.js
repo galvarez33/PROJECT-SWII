@@ -6,6 +6,7 @@ const { Database } = require("../scripts/database");
 
 // Load schema beforehand
 const Ajv = require('ajv/dist/2020');
+const { resolveSchema } = require('ajv/dist/compile');
 const ajv = new Ajv();
 
 ajv.addSchema(resourceSchema, 'resource');
@@ -27,159 +28,109 @@ router.get('/', async function (req, res, next) {
   // 2. Devolver resultado 
   if (resources.length) {
     const response = JSON.stringify(resources);
-    res.contentType("json");
-    res.statusCode = 200;
-    res.statusMessage = "Ok";
-    res.send(response);
+    sendResponse(res, 200, response);
   } else {
-    res.contentType("json");
-    res.statusCode = 204;
-    res.statusMessage = "No hay contenido";
-    res.send(response);
+    sendResponse(res, 204, "No hay contenido");
   }
 });
 
 router.post('/', async function (req, res, next) {
-  // 1. Comprobar admin
-  if (req.user && req.user.admin) {
-    try {
-      const data = req.body;
-      const validate = ajv.getSchema('resource');
-      const valid = validate(data);
-      if (valid) {
-        // 2. Añadir en mongo recurso
-        const databaseManager = Database.getInstance();
-        const db = databaseManager.client.db("scrapiffy");
-        const mongoResponse = await db.collection("resources").insertOne({
-          _id: data.id,
-          description: data.description
-        });
-        // 3. Devolver respuesta
-        const response = JSON.stringify({
-          id: mongoResponse.insertedId
-        });
-        res.contentType("json");
-        res.statusCode = 201;
-        res.statusMessage = "Created";
-        res.send(response);
-      } else {
-        throw new Error();
-      }
-    } catch {
-      res.statusCode = 400;
-      res.statusMessage = "Formato incorrecto";
-      res.send();
-    }
-  }
+  const admin = checkAdmin(req, res);
+  if (admin) {
+    const data = req.body;
+    const valid = validateSchema("resource", req, res);
+    if (valid) {
+      // 2. Añadir en mongo recurso
+      const databaseManager = Database.getInstance();
+      const db = databaseManager.client.db("scrapiffy");
+      const mongoResponse = await db.collection("resources").insertOne({
+        _id: data.id,
+        descripcion: data.descripcion
+      });
 
-  else {
-    if (req.user) {
-      res.contentType("json");
-      res.statusCode = 403;
-      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
-      res.send();
-    }
-    else {
-      res.statusCode = 401;
-      res.statusMessage = "Esta operación requiere autentificación";
-      res.send();
+      // 3. Devolver respuesta
+      const response = JSON.stringify({
+        id: mongoResponse.insertedId
+      });
+      sendResponse(res, 201, response);
     }
   }
 });
 
 router.put('/:idRecurso', async function (req, res, next) {
-  if (req.user && req.user.admin) {
-    try {
-      const data = req.body;
-      const validate = ajv.getSchema("resourcePut");
-      const valid = validate(data);
-      if (valid) {
-        // 2. Añadir en mongo recurso
-        const databaseManager = Database.getInstance();
-        const db = databaseManager.client.db("scrapiffy");
+  const admin = checkAdmin(req, res);
+  if (admin) {
+    const valid = validateSchema("resourcePut", req, res)
+    const data = req.body;
 
-        const updateDoc = {
-          $set: {
-            descripcion: data.descripcion
-          },
-        };
+    if (valid) {
+      // 2. Añadir en mongo recurso
+      const databaseManager = Database.getInstance();
+      const db = databaseManager.client.db("scrapiffy");
 
-        await db.collection("resources").updateOne({ _id: req.params.idRecurso }, updateDoc);
+      const updateDoc = {
+        $set: {
+          descripcion: data.descripcion
+        },
+      };
 
-        // 3. Devolver respuesta
-        res.contentType("json");
-        res.statusCode = 200;
-        res.statusMessage = "Ok";
-        res.send("Todo correcto");
-      } else {
-        throw new Error();
-      }
-    } catch {
-      res.statusCode = 400;
-      res.statusMessage = "Formato incorrecto";
-      res.send();
-    }
-  }
+      await db.collection("resources").updateOne({ _id: req.params.idRecurso }, updateDoc);
 
-  else {
-    if (req.user) {
-      res.contentType("json");
-      res.statusCode = 403;
-      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
-      res.send();
-    }
-    else {
-      res.statusCode = 401;
-      res.statusMessage = "Esta operación requiere autentificación";
-      res.send();
+      // 3. Devolver respuesta
+      sendResponse(res, 200, "Todo correcto");
     }
   }
 });
 
 router.delete('/:idRecurso', async function (req, res, next) {
-  req.user = { admin: true }
-  if (req.user && req.user.admin) {
-    try {
-      // 2. Añadir en mongo recurso
-      const databaseManager = Database.getInstance();
-      const db = databaseManager.client.db("scrapiffy");
+  //const admin = checkAdmin(req, res);
+  const admin = true;
+  if (admin) {
+    // 2. Añadir en mongo recurso
+    const databaseManager = Database.getInstance();
+    const db = databaseManager.client.db("scrapiffy");
+    const mongoResponse = await db.collection("resources").deleteOne({ _id: req.params.idRecurso });
 
-      const mongoResponse = await db.collection("resources").deleteOne({ _id: req.params.idRecurso });
-      if (mongoResponse.deletedCount) {
-        res.contentType("json");
-        res.statusCode = 200;
-        res.statusMessage = "Ok";
-        res.send("Todo correcto");
-      } else {
-        res.contentType("json");
-        res.statusCode = 404;
-        res.statusMessage = "Not Found";
-        res.send(`El recurso ${req.params.idRecurso} no existe`);
-      }
-      // 3. Devolver respuesta
-
-    } catch {
-      res.statusCode = 400;
-      res.statusMessage = "Formato incorrecto";
-      res.send();
+    // 3. Devolver respuesta
+    if (mongoResponse.deletedCount) {
+      sendResponse(res, 200, "Todo correcto");
+    } else {
+      sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
     }
   }
+});
 
+function checkAdmin(req, res) {
+  if (req.user && req.user.admin) {
+    return true;
+  }
   else {
     if (req.user) {
-      res.contentType("json");
-      res.statusCode = 403;
-      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
-      res.send();
+      sendResponse(res, 403, "No se dispone de los permisos necesarios para realizar esta operación");
     }
     else {
-      res.statusCode = 401;
-      res.statusMessage = "Esta operación requiere autentificación";
-      res.send();
+      sendResponse(res, 401, "Esta operación requiere autentificación");
     }
   }
+  return false;
+}
 
-});
+function validateSchema(schema, req, res) {
+  const validate = ajv.getSchema(schema);
+  const valid = validate(req.body);
+  
+  if (!valid) {
+    sendResponse(res, 400, "Formato incorrecto");
+  }
+
+  return valid;
+}
+
+function sendResponse(res, statusCode, response) {
+  res.contentType("json");
+  res.statusCode = statusCode;
+  res.send(response);
+}
 
 router.get('/:idRecurso/:idActivo', function (req, res, next) {
   // 1. Comprueba en Mongo si hay activo
