@@ -1,5 +1,6 @@
 const express = require('express');
 const resourceSchema = require('../schemas/resource.json');
+const resourcePutSchema = require("../schemas/resourcePut.json");
 const router = express.Router();
 const { Database } = require("../scripts/database");
 
@@ -8,6 +9,7 @@ const Ajv = require('ajv/dist/2020');
 const ajv = new Ajv();
 
 ajv.addSchema(resourceSchema, 'resource');
+ajv.addSchema(resourcePutSchema, "resourcePut");
 
 /** GET: Method to get list of resources  */
 router.get('/', async function (req, res, next) {
@@ -85,12 +87,53 @@ router.post('/', async function (req, res, next) {
   }
 });
 
-router.put('/:idRecurso', function (req, res, next) {
-  // 1. Comprobar admin
+router.put('/:idRecurso', async function (req, res, next) {
+  if (req.user && req.user.admin) {
+    try {
+      const data = req.body;
+      const validate = ajv.getSchema("resourcePut");
+      const valid = validate(data);
+      if (valid) {
+        // 2. Añadir en mongo recurso
+        const databaseManager = Database.getInstance();
+        const db = databaseManager.client.db("scrapiffy");
 
-  // 2. Añadir recurso
+        const updateDoc = {
+          $set: {
+            descripcion: data.descripcion
+          },
+        };
 
-  // 3. Devolver recursos
+        await db.collection("resources").updateOne({ _id: req.params.idRecurso }, updateDoc);
+
+        // 3. Devolver respuesta
+        res.contentType("json");
+        res.statusCode = 200;
+        res.statusMessage = "Ok";
+        res.send("Todo correcto");
+      } else {
+        throw new Error();
+      }
+    } catch {
+      res.statusCode = 400;
+      res.statusMessage = "Formato incorrecto";
+      res.send();
+    }
+  }
+
+  else {
+    if (req.user) {
+      res.contentType("json");
+      res.statusCode = 403;
+      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
+      res.send();
+    }
+    else {
+      res.statusCode = 401;
+      res.statusMessage = "Esta operación requiere autentificación";
+      res.send();
+    }
+  }
 });
 
 router.delete('/:idRecurso', function (req, res, next) {
