@@ -1,6 +1,13 @@
 const express = require('express');
+const resourceSchema = require('../schemas/resource.json');
 const router = express.Router();
 const { Database } = require("../scripts/database");
+
+// Load schema beforehand
+const Ajv = require('ajv/dist/2020');
+const ajv = new Ajv();
+
+ajv.addSchema(resourceSchema,'resource');
 
 /** GET: Method to get list of resources  */
 router.get('/', async function(req, res, next) {
@@ -30,12 +37,58 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.post('/', function(req, res, next) {
-  // 1. Comprobar admin
+router.post('/', async function(req, res, next) {
+  req.user = {
+    admin : true
+  }
+// 1. Comprobar admin
+if (req.user && req.user.admin){
+  try {
+    console.log('ping');
+    const data = JSON.parse(req.body);
+    const validate = ajv.getSchema('resource');
+    const valid = validate(data);
+    if (valid) {
+      // 2. Añadir en mongo recurso
+      const databaseManager = Database.getInstance();
+      const db = databaseManager.client.db("scrapiffy");
+      const mongoResponse = await db.collection("resources").insertOne({
+        _id : data.id,
+        description: data.description
+      });
+       // 3. Devolver respuesta
+       const response = JSON.stringify({
+          id : mongoResponse.insertedId
+       });
+        res.contentType("json");
+        res.statusCode = 201;
+        res.statusMessage = "Created";
+        res.send(response);
+    } else {
+      throw new Error();
+    }
+  } catch {
+    res.statusCode = 400;
+    res.statusMessage = "Formato incorrecto";
+    res.send();
+  } 
 
-  // 2. Añadir en mongo recurso
+}
+else {
+  if (req.user) {
+    res.statusCode = 401;
+    res.statusMessage = "Esta operación requiere autentificación";
+    res.send();
+  }
+  else {
+    res.contentType("json");
+    res.statusCode = 403;
+    res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
+    res.send();
+  }
+}
 
-  // 3. Devolver respuesta
+ 
 });
 
 router.put('/:idRecurso', function(req, res, next) { 
