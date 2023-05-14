@@ -1,6 +1,7 @@
 const express = require('express');
 const resourceSchema = require('../schemas/resource.json');
 const resourcePutSchema = require("../schemas/resourcePut.json");
+const assetSchema = require("../schemas/asset.json");
 const router = express.Router();
 const { Database } = require("../scripts/database");
 
@@ -11,6 +12,7 @@ const ajv = new Ajv();
 
 ajv.addSchema(resourceSchema, 'resource');
 ajv.addSchema(resourcePutSchema, "resourcePut");
+ajv.addSchema(assetSchema, "assetSchema");
 
 /** GET: Method to get list of resources  */
 router.get('/', async function (req, res, next) {
@@ -47,6 +49,9 @@ router.post('/', async function (req, res, next) {
         _id: data.id,
         descripcion: data.descripcion
       });
+
+      //crear colección para el recurso
+      await db.createCollection(data.id);
 
       // 3. Devolver respuesta
       const response = JSON.stringify({
@@ -118,7 +123,7 @@ function checkAdmin(req, res) {
 function validateSchema(schema, req, res) {
   const validate = ajv.getSchema(schema);
   const valid = validate(req.body);
-  
+
   if (!valid) {
     sendResponse(res, 400, "Formato incorrecto");
   }
@@ -132,14 +137,14 @@ function sendResponse(res, statusCode, response) {
   res.send(response);
 }
 
-router.get('/:idRecurso/:idActivo', async function(req, res, next) {
+router.get('/:idRecurso/:idActivo', async function (req, res, next) {
   // 1. Consulta a mongo -> activos
   const resource = req.params.idRecurso;
   const asset = req.params.idActivo;
 
   const databaseManager = Database.getInstance();
   const db = databaseManager.client.db("scrapiffy");
-  const mongoResponse = await db.collection(resource).findOne({_id: asset});
+  const mongoResponse = await db.collection(resource).findOne({ _id: asset });
 
   if (mongoResponse) {
     console.log(mongoResponse)
@@ -161,12 +166,37 @@ router.get('/:idRecurso/:idActivo', async function(req, res, next) {
   }
 });
 
-router.post('/:idRecurso/:idActivo', function (req, res, next) {
-  // 1. Comprobar admin
+router.post('/:idRecurso/:idActivo', async function (req, res, next) {
+  const admin = checkAdmin(req, res);
+  if (admin) {
+    const databaseManager = Database.getInstance();
+    const db = databaseManager.client.db("scrapiffy");
 
-  // 2. Añadir recurso
+    const collections = await db.collections();
+    const resources = collections.map(c => c.s.namespace.collection);
+    const resourceExists = resources.includes(req.params.idRecurso);
 
-  // 3. Devolver recursos
+    if (resourceExists) {
+      const data = req.body;
+      const valid = validateSchema("assetSchema", req, res);
+      if (valid) {
+        // 2. Añadir en mongo recurso
+
+        const mongoResponse = await db.collection(req.params.idRecurso).insertOne({
+          _id: data.id,
+          ocurrencias: data.ocurrencias
+        });
+
+        // 3. Devolver respuesta
+        const response = JSON.stringify({
+          id: mongoResponse.insertedId
+        });
+        sendResponse(res, 201, response);
+      }
+    } else {
+      sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
+    }
+  }
 });
 
 router.put('/:idRecurso/:idActivo', function (req, res, next) {
