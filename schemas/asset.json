@@ -10,8 +10,7 @@
     ],
     "properties": {
         "id": {
-            "type": "string",
-            "format": "email"
+            "type": "string"
         },
         "ocurrencias": {
             "type": "array",
@@ -23,12 +22,10 @@
                 ],
                 "properties": {
                     "timestamp": {
-                        "type": "string",
-                        "format": "date"
+                        "type": "string"
                     },
                     "source": {
-                        "type": "string",
-                        "format": "uri"
+                        "type": "string"
                     }
                 }
             }
