@@ -136,12 +136,49 @@ router.put('/:idRecurso', async function (req, res, next) {
   }
 });
 
-router.delete('/:idRecurso', function (req, res, next) {
-  // 1. Comprobar admin
+router.delete('/:idRecurso', async function (req, res, next) {
+  req.user = { admin: true }
+  if (req.user && req.user.admin) {
+    try {
+      // 2. Añadir en mongo recurso
+      const databaseManager = Database.getInstance();
+      const db = databaseManager.client.db("scrapiffy");
 
-  // 2. Añadir recurso
+      const mongoResponse = await db.collection("resources").deleteOne({ _id: req.params.idRecurso });
+      if (mongoResponse.deletedCount) {
+        res.contentType("json");
+        res.statusCode = 200;
+        res.statusMessage = "Ok";
+        res.send("Todo correcto");
+      } else {
+        res.contentType("json");
+        res.statusCode = 404;
+        res.statusMessage = "Not Found";
+        res.send(`El recurso ${req.params.idRecurso} no existe`);
+      }
+      // 3. Devolver respuesta
 
-  // 3. Devolver recursos
+    } catch {
+      res.statusCode = 400;
+      res.statusMessage = "Formato incorrecto";
+      res.send();
+    }
+  }
+
+  else {
+    if (req.user) {
+      res.contentType("json");
+      res.statusCode = 403;
+      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
+      res.send();
+    }
+    else {
+      res.statusCode = 401;
+      res.statusMessage = "Esta operación requiere autentificación";
+      res.send();
+    }
+  }
+
 });
 
 router.get('/:idRecurso/:idActivo', function (req, res, next) {
