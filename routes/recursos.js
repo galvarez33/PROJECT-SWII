@@ -1,12 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const { Database } = require("../scripts/database");
 
 /** GET: Method to get list of resources  */
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
   // 1. Consulta a mongo -> recursos
+  const databaseManager = Database.getInstance();
+  const db = databaseManager.client.db("scrapiffy");
+  const cursor = db.collection("resources").find();
+
+  const resources = [];
+  while (await cursor.hasNext()) {
+    const resource = await cursor.next();
+    resources.push(resource);
+  }
 
   // 2. Devolver resultado 
-  res.send('respond with a resource');
+  if (resources.length) {
+    const response = JSON.stringify(resources);
+    res.contentType("json");
+    res.statusCode = 200;
+    res.statusMessage = "Ok";
+    res.send(response);
+  } else {
+    res.contentType("json");
+    res.statusCode = 204;
+    res.statusMessage = "No hay contenido";
+    res.send(response);
+  }
 });
 
 router.post('/', function(req, res, next) {

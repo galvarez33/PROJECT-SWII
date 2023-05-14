@@ -10,6 +10,10 @@ var http = require('http');
 
 // Initialize environment variables
 require('dotenv').config()
+const { Database } = require("../scripts/database");
+(async() => {
+  await Database.getInstance().initializeDatabase();
+})();
 
 /**
  * Get port from environment and store in Express.
