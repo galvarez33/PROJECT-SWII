@@ -44,8 +44,7 @@ router.post('/', async function(req, res, next) {
 // 1. Comprobar admin
 if (req.user && req.user.admin){
   try {
-    console.log('ping');
-    const data = JSON.parse(req.body);
+    const data = req.body;
     const validate = ajv.getSchema('resource');
     const valid = validate(data);
     if (valid) {
