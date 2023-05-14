@@ -7,10 +7,10 @@ const { Database } = require("../scripts/database");
 const Ajv = require('ajv/dist/2020');
 const ajv = new Ajv();
 
-ajv.addSchema(resourceSchema,'resource');
+ajv.addSchema(resourceSchema, 'resource');
 
 /** GET: Method to get list of resources  */
-router.get('/', async function(req, res, next) {
+router.get('/', async function (req, res, next) {
   // 1. Consulta a mongo -> recursos
   const databaseManager = Database.getInstance();
   const db = databaseManager.client.db("scrapiffy");
@@ -37,60 +37,55 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.post('/', async function(req, res, next) {
-  req.user = {
-    admin : true
-  }
-// 1. Comprobar admin
-if (req.user && req.user.admin){
-  try {
-    const data = req.body;
-    const validate = ajv.getSchema('resource');
-    const valid = validate(data);
-    if (valid) {
-      // 2. Añadir en mongo recurso
-      const databaseManager = Database.getInstance();
-      const db = databaseManager.client.db("scrapiffy");
-      const mongoResponse = await db.collection("resources").insertOne({
-        _id : data.id,
-        description: data.description
-      });
-       // 3. Devolver respuesta
-       const response = JSON.stringify({
-          id : mongoResponse.insertedId
-       });
+router.post('/', async function (req, res, next) {
+  // 1. Comprobar admin
+  if (req.user && req.user.admin) {
+    try {
+      const data = req.body;
+      const validate = ajv.getSchema('resource');
+      const valid = validate(data);
+      if (valid) {
+        // 2. Añadir en mongo recurso
+        const databaseManager = Database.getInstance();
+        const db = databaseManager.client.db("scrapiffy");
+        const mongoResponse = await db.collection("resources").insertOne({
+          _id: data.id,
+          description: data.description
+        });
+        // 3. Devolver respuesta
+        const response = JSON.stringify({
+          id: mongoResponse.insertedId
+        });
         res.contentType("json");
         res.statusCode = 201;
         res.statusMessage = "Created";
         res.send(response);
-    } else {
-      throw new Error();
+      } else {
+        throw new Error();
+      }
+    } catch {
+      res.statusCode = 400;
+      res.statusMessage = "Formato incorrecto";
+      res.send();
     }
-  } catch {
-    res.statusCode = 400;
-    res.statusMessage = "Formato incorrecto";
-    res.send();
-  } 
-
-}
-else {
-  if (req.user) {
-    res.statusCode = 401;
-    res.statusMessage = "Esta operación requiere autentificación";
-    res.send();
   }
+
   else {
-    res.contentType("json");
-    res.statusCode = 403;
-    res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
-    res.send();
+    if (req.user) {
+      res.contentType("json");
+      res.statusCode = 403;
+      res.statusMessage = "No se dispone de los permisos necesarios para realizar esta operación";
+      res.send();
+    }
+    else {
+      res.statusCode = 401;
+      res.statusMessage = "Esta operación requiere autentificación";
+      res.send();
+    }
   }
-}
-
- 
 });
 
-router.put('/:idRecurso', function(req, res, next) { 
+router.put('/:idRecurso', function (req, res, next) {
   // 1. Comprobar admin
 
   // 2. Añadir recurso
@@ -98,7 +93,7 @@ router.put('/:idRecurso', function(req, res, next) {
   // 3. Devolver recursos
 });
 
-router.delete('/:idRecurso', function(req, res, next) { 
+router.delete('/:idRecurso', function (req, res, next) {
   // 1. Comprobar admin
 
   // 2. Añadir recurso
@@ -106,13 +101,13 @@ router.delete('/:idRecurso', function(req, res, next) {
   // 3. Devolver recursos
 });
 
-router.get('/:idRecurso/:idActivo', function(req, res, next) {
+router.get('/:idRecurso/:idActivo', function (req, res, next) {
   // 1. Comprueba en Mongo si hay activo
-  
+
   // 2. Si hay, lo devuelve, si no devuleve 404
 });
 
-router.post('/:idRecurso/:idActivo', function(req, res, next) {
+router.post('/:idRecurso/:idActivo', function (req, res, next) {
   // 1. Comprobar admin
 
   // 2. Añadir recurso
@@ -120,7 +115,7 @@ router.post('/:idRecurso/:idActivo', function(req, res, next) {
   // 3. Devolver recursos
 });
 
-router.put('/:idRecurso/:idActivo', function(req, res, next) {
+router.put('/:idRecurso/:idActivo', function (req, res, next) {
   // 1. Comprobar admin
 
   // 2. Añadir recurso
@@ -128,7 +123,7 @@ router.put('/:idRecurso/:idActivo', function(req, res, next) {
   // 3. Devolver recursos
 });
 
-router.delete('/:idRecurso/:idActivo', function(req, res, next) {
+router.delete('/:idRecurso/:idActivo', function (req, res, next) {
   // 1. Comprobar admin
 
   // 2. Añadir recurso
