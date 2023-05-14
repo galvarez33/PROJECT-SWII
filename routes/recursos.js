@@ -132,10 +132,33 @@ function sendResponse(res, statusCode, response) {
   res.send(response);
 }
 
-router.get('/:idRecurso/:idActivo', function (req, res, next) {
-  // 1. Comprueba en Mongo si hay activo
+router.get('/:idRecurso/:idActivo', async function(req, res, next) {
+  // 1. Consulta a mongo -> activos
+  const resource = req.params.idRecurso;
+  const asset = req.params.idActivo;
 
-  // 2. Si hay, lo devuelve, si no devuleve 404
+  const databaseManager = Database.getInstance();
+  const db = databaseManager.client.db("scrapiffy");
+  const mongoResponse = await db.collection(resource).findOne({_id: asset});
+
+  if (mongoResponse) {
+    console.log(mongoResponse)
+    const ocurrencias = [];
+    mongoResponse.ocurrencias.forEach(o => {
+      ocurrencias.push({
+        timestamp: o.timestamp,
+        source: o.source
+      });
+    });
+
+    const response = {
+      id: mongoResponse.id,
+      ocurrencias
+    };
+    sendResponse(res, 200, response);
+  } else {
+    sendResponse(res, 404, `El recurso ${asset} no existe`);
+  }
 });
 
 router.post('/:idRecurso/:idActivo', function (req, res, next) {
