@@ -338,7 +338,7 @@ components:
         - descripcion
       properties: 
         id: 
-          type: string
+          type: string  
           description: Id del recurso
         descripcion: 
           type: string

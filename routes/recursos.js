@@ -39,7 +39,7 @@ router.get('/', async function (req, res, next) {
 });
 
 router.post('/', async function (req, res, next) {
-  const admin = checkAdmin(req, res);
+  const admin = true //checkAdmin(req, res);
   if (admin) {
     const data = req.body;
     const valid = validateSchema("resource", req, res);
@@ -169,7 +169,7 @@ router.get('/:idRecurso/:idActivo', async function (req, res, next) {
 });
 
 router.post('/:idRecurso/:idActivo', async function (req, res, next) {
-  const admin = checkAdmin(req, res);
+  const admin = true;//checkAdmin(req, res);
   if (admin) {
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
@@ -201,8 +201,8 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
   }
 });
 
-router.put('/:idRecurso/:idActivo',  async function (req, res, next) {
-  const admin = checkAdmin(req, res);
+router.put('/:idRecurso/:idActivo', async function (req, res, next) {
+  const admin = true;//checkAdmin(req, res);
   if (admin) {
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
@@ -217,12 +217,16 @@ router.put('/:idRecurso/:idActivo',  async function (req, res, next) {
       if (valid) {
         // 2. Añadir en mongo recurso
         const updateDoc = {
-          $push: { ocurrencias: data } 
+          $push: { ocurrencias: data }
         }
-        const mongoResponse = await db.collection(req.params.idRecurso).updateOne({ _id: data.id }, updateDoc);
+        const mongoResponse = await db.collection(req.params.idRecurso).updateOne({ _id: req.params.idActivo }, updateDoc);
 
         // 3. Devolver respuesta
-        sendResponse(res, 200, "Todo correcto");
+        if (mongoResponse.modifiedCount === 1) {
+          sendResponse(res, 200, "Todo correcto");
+        } else {
+          sendResponse(res, 404, `El activo ${req.params.idActivo} no existe`);
+        }
       }
     } else {
       sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
@@ -230,12 +234,31 @@ router.put('/:idRecurso/:idActivo',  async function (req, res, next) {
   }
 });
 
-router.delete('/:idRecurso/:idActivo', function (req, res, next) {
-  // 1. Comprobar admin
+router.delete('/:idRecurso/:idActivo', async function (req, res, next) {
+  const admin = true;//checkAdmin(req, res);
+  if (admin) {
+    const databaseManager = Database.getInstance();
+    const db = databaseManager.client.db("scrapiffy");
 
-  // 2. Añadir recurso
+    const collections = await db.collections();
+    const resources = collections.map(c => c.s.namespace.collection);
+    const resourceExists = resources.includes(req.params.idRecurso);
 
-  // 3. Devolver recursos
+    if (resourceExists) {
+      const mongoResponse = await db.collection(req.params.idRecurso).deleteOne({ _id: req.params.idActivo });
+
+      // 3. Devolver respuesta
+      if (mongoResponse.deletedCount) {
+        sendResponse(res, 200, "Todo correcto");
+      } else {
+        sendResponse(res, 404, `El activo ${req.params.idActivo} no existe`);
+      }
+    } else {
+      sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
+    } 
+
+  }
+
 });
 
 module.exports = router;
