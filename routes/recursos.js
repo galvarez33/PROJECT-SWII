@@ -145,9 +145,13 @@ function sendResponse(res, statusCode, response) {
 }
 
 function getContent(req, res, validator) {
-  if (req.is("application/xml")) {
+  console.log(req.headers);
+  if (req.is("text/plain")) {
+    let ans = parser.parse(req.body)
     valid = true
-    if (valid) {
+    console.log(req);
+    console.log(ans);
+    if (valid) { 
       return parser.parse(req.body);
     } else {
       sendResponse(res, 400, "Formato incorrecto");
