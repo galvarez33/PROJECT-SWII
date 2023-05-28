@@ -5,8 +5,6 @@ const assetSchema = require("../schemas/asset.json");
 const assetPutSchema = require("../schemas/assetPutSchema.json");
 const router = express.Router();
 const { Database } = require("../scripts/database");
-const Libxml = require('node-libxml');
-let libxml = new Libxml();
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const parser = new XMLParser()
 
@@ -148,10 +146,8 @@ function sendResponse(res, statusCode, response) {
 
 function getContent(req, res, validator) {
   if (req.is("application/xml")) {
-    const wellFormed = libxml.loadXmlFromString(req.body);
-    libxml.loadDtds([dtds[validator]]);
-    const valid = libxml.validateAgainstDtds();
-    if (valid && wellFormed) {
+    valid = true
+    if (valid) {
       return parser.parse(req.body);
     } else {
       sendResponse(res, 400, "Formato incorrecto");
