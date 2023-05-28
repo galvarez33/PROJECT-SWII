@@ -5,16 +5,27 @@ const assetSchema = require("../schemas/asset.json");
 const assetPutSchema = require("../schemas/assetPutSchema.json");
 const router = express.Router();
 const { Database } = require("../scripts/database");
+const Libxml = require('node-libxml');
+let libxml = new Libxml();
+const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
+const parser = new XMLParser()
+
 
 // Load schema beforehand
 const Ajv = require('ajv/dist/2020');
-const { resolveSchema } = require('ajv/dist/compile');
 const ajv = new Ajv();
 
 ajv.addSchema(resourceSchema, 'resource');
 ajv.addSchema(resourcePutSchema, "resourcePut");
 ajv.addSchema(assetSchema, "assetSchema");
 ajv.addSchema(assetPutSchema, "assetPutSchema");
+
+const dtds = {
+  resource: "../schemas/resource.dtd",
+  resourcePut: "../schemas/resourcePut.dtd",
+  assetSchema: "../schemas/asset.dtd",
+  assetPutSchema: "../schemas/assetPutSchema.dtd"
+}
 
 /** GET: Method to get list of resources  */
 router.get('/', async function (req, res, next) {
@@ -41,9 +52,8 @@ router.get('/', async function (req, res, next) {
 router.post('/', async function (req, res, next) {
   const admin = true //checkAdmin(req, res);
   if (admin) {
-    const data = req.body;
-    const valid = validateSchema("resource", req, res);
-    if (valid) {
+    const data = getContent(req, res, "resource")
+    if (data) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
       const db = databaseManager.client.db("scrapiffy");
@@ -67,10 +77,8 @@ router.post('/', async function (req, res, next) {
 router.put('/:idRecurso', async function (req, res, next) {
   const admin = checkAdmin(req, res);
   if (admin) {
-    const valid = validateSchema("resourcePut", req, res)
-    const data = req.body;
-
-    if (valid) {
+    const data = getContent(req, res, "resourcePut")
+    if (data) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
       const db = databaseManager.client.db("scrapiffy");
@@ -80,7 +88,6 @@ router.put('/:idRecurso', async function (req, res, next) {
           descripcion: data.descripcion
         },
       };
-
       await db.collection("resources").updateOne({ _id: req.params.idRecurso }, updateDoc);
 
       // 3. Devolver respuesta
@@ -139,6 +146,24 @@ function sendResponse(res, statusCode, response) {
   res.send(response);
 }
 
+function getContent(req, res, validator) {
+  if (req.is("application/xml")) {
+    const wellFormed = libxml.loadXmlFromString(req.body);
+    libxml.loadDtds([dtds[validator]]);
+    const valid = libxml.validateAgainstDtds();
+    if (valid && wellFormed) {
+      return parser.parse(req.body);
+    } else {
+      sendResponse(res, 400, "Formato incorrecto");
+      return null;
+    }
+  } else if (req.is("application/json")) {
+    const data = req.body;
+    const valid = validateSchema(validator, req, res);
+    return valid ? data : null;
+  } else sendResponse(res, 400, "Formato incorrecto");
+}
+
 router.get('/:idRecurso/:idActivo', async function (req, res, next) {
   // 1. Consulta a mongo -> activos
   const resource = req.params.idRecurso;
@@ -179,9 +204,8 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
     const resourceExists = resources.includes(req.params.idRecurso);
 
     if (resourceExists) {
-      const data = req.body;
-      const valid = validateSchema("assetSchema", req, res);
-      if (valid) {
+      const data = getContent(req, res, "assetSchema");
+      if (data) {
         // 2. Añadir en mongo recurso
 
         const mongoResponse = await db.collection(req.params.idRecurso).insertOne({
@@ -212,9 +236,8 @@ router.put('/:idRecurso/:idActivo', async function (req, res, next) {
     const resourceExists = resources.includes(req.params.idRecurso);
 
     if (resourceExists) {
-      const data = req.body;
-      const valid = validateSchema("assetPutSchema", req, res);
-      if (valid) {
+      const data = getContent(req, res, "assetPutSchema");
+      if (data) {
         // 2. Añadir en mongo recurso
         const updateDoc = {
           $push: { ocurrencias: data }
@@ -255,10 +278,9 @@ router.delete('/:idRecurso/:idActivo', async function (req, res, next) {
       }
     } else {
       sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
-    } 
+    }
 
   }
-
 });
 
 module.exports = router;
