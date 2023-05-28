@@ -55,19 +55,24 @@ router.post('/', async function (req, res, next) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
       const db = databaseManager.client.db("scrapiffy");
-      const mongoResponse = await db.collection("resources").insertOne({
-        _id: data.id,
-        descripcion: data.descripcion
-      });
 
-      //crear colección para el recurso
-      await db.createCollection(data.id);
+      try {
+        const mongoResponse = await db.collection("resources").insertOne({
+          _id: data.id,
+          descripcion: data.descripcion
+        });
 
-      // 3. Devolver respuesta
-      const response = JSON.stringify({
-        id: mongoResponse.insertedId
-      });
-      sendResponse(res, 201, response);
+        //crear colección para el recurso
+        await db.createCollection(data.id);
+
+        // 3. Devolver respuesta
+        const response = JSON.stringify({
+          id: mongoResponse.insertedId
+        });
+        sendResponse(res, 201, response);
+      } catch {
+        sendResponse(res, 400, "El id ya existe");
+      }
     }
   }
 });
@@ -127,9 +132,9 @@ function checkAdmin(req, res) {
   return false;
 }
 
-function validateSchema(schema, req, res) {
+function validateSchema(schema, data, res) {
   const validate = ajv.getSchema(schema);
-  const valid = validate(req.body);
+  const valid = validate(data);
 
   if (!valid) {
     sendResponse(res, 400, "Formato incorrecto");
@@ -145,22 +150,20 @@ function sendResponse(res, statusCode, response) {
 }
 
 function getContent(req, res, validator) {
-  if (req.is("application/xml")) {
-    let ans = parser.parse(req.body)
-    valid = true
-    console.log(req.body);
-    console.log(ans);
-    if (valid) { 
-      return parser.parse(req.body);
-    } else {
-      sendResponse(res, 400, "Formato incorrecto");
-      return null;
-    }
+  let data = '';
+
+  if (req.is("application/x-www-form-urlencoded")) {
+    const body = Object.keys(req.body)[0];
+    data = parser.parse(body).content;
   } else if (req.is("application/json")) {
-    const data = req.body;
-    const valid = validateSchema(validator, req, res);
-    return valid ? data : null;
-  } else sendResponse(res, 400, "Formato incorrecto");
+    data = req.body;
+  } else {
+    sendResponse(res, 400, "Formato incorrecto");
+  }
+  console.log(data)
+
+  const valid = validateSchema(validator, data, res);
+  return valid ? data : null;
 }
 
 router.get('/:idRecurso/:idActivo', async function (req, res, next) {
@@ -206,17 +209,20 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
       const data = getContent(req, res, "assetSchema");
       if (data) {
         // 2. Añadir en mongo recurso
+        try {
+          const mongoResponse = await db.collection(req.params.idRecurso).insertOne({
+            _id: data.id,
+            ocurrencias: data.ocurrencias
+          });
 
-        const mongoResponse = await db.collection(req.params.idRecurso).insertOne({
-          _id: data.id,
-          ocurrencias: data.ocurrencias
-        });
-
-        // 3. Devolver respuesta
-        const response = JSON.stringify({
-          id: mongoResponse.insertedId
-        });
-        sendResponse(res, 201, response);
+          // 3. Devolver respuesta
+          const response = JSON.stringify({
+            id: mongoResponse.insertedId
+          });
+          sendResponse(res, 201, response);
+        } catch {
+          sendResponse(res, 400, 'El id ya existe');
+        }
       }
     } else {
       sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
