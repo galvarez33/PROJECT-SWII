@@ -145,11 +145,10 @@ function sendResponse(res, statusCode, response) {
 }
 
 function getContent(req, res, validator) {
-  console.log(req.headers);
-  if (req.is("text/plain")) {
+  if (req.is("application/xml")) {
     let ans = parser.parse(req.body)
     valid = true
-    console.log(req);
+    console.log(req.body);
     console.log(ans);
     if (valid) { 
       return parser.parse(req.body);
