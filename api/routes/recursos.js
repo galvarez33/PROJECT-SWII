@@ -45,7 +45,7 @@ router.get('/', async function (req, res, next) {
 router.post('/', async function (req, res, next) {
   const admin = checkAdmin(req, res);
   if (admin) {
-    const data = await getContent(req, res, "resource")
+    const data = await await getContent(req, res, "resource")
     if (data) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
@@ -75,7 +75,7 @@ router.post('/', async function (req, res, next) {
 router.put('/:idRecurso', async function (req, res, next) {
   const admin = checkAdmin(req, res);
   if (admin) {
-    const data = getContent(req, res, "resourcePut")
+    const data = await getContent(req, res, "resourcePut")
     if (data) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
@@ -257,7 +257,7 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
     const resourceExists = resources.includes(req.params.idRecurso);
 
     if (resourceExists) {
-      const data = getContent(req, res, "assetSchema");
+      const data = await getContent(req, res, "assetSchema");
       if (data) {
         // 2. Añadir en mongo recurso
         try {
@@ -292,7 +292,7 @@ router.put('/:idRecurso/:idActivo', async function (req, res, next) {
     const resourceExists = resources.includes(req.params.idRecurso);
 
     if (resourceExists) {
-      const data = getContent(req, res, "assetPutSchema");
+      const data = await getContent(req, res, "assetPutSchema");
       if (data) {
         // 2. Añadir en mongo recurso
         const updateDoc = {
