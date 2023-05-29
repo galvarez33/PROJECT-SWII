@@ -192,32 +192,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta404"
-  /recursos/{idRecurso}/{idActivo}:
-    parameters:
-      - $ref: "#/components/parameters/idRecurso"
-      - $ref: "#/components/parameters/idActivo"
-    get:
-      summary: Obtiene un activo específico.
-      description: Obtiene un activo específico del recurso genérico.
-      responses: 
-        "200": 
-          description: OK
-          content: 
-            application/json: 
-              schema: 
-                $ref: "#/components/schemas/Activo"
-              example:
-                id: "ejemplo@gmail.com"
-                ocurrencias:
-                  - timestamp: "12/03/2024"
-                    source: "www.ejemplo.com"
-        "404":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Respuesta404"
-              example: "El recurso ejemplo@gmail.com no existe"
     post:
       summary: Crea una entrada específica para el recurso genérico.
       description: Añade un activo específico al recurso genérico.
@@ -259,6 +233,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Respuesta403"
+  /recursos/{idRecurso}/{idActivo}:
+    parameters:
+      - $ref: "#/components/parameters/idRecurso"
+      - $ref: "#/components/parameters/idActivo"
+    get:
+      summary: Obtiene un activo específico.
+      description: Obtiene un activo específico del recurso genérico.
+      responses: 
+        "200": 
+          description: OK
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/Activo"
+              example:
+                id: "ejemplo@gmail.com"
+                ocurrencias:
+                  - timestamp: "12/03/2024"
+                    source: "www.ejemplo.com"
+        "404":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Respuesta404"
+              example: "El recurso ejemplo@gmail.com no existe"
     put:
       summary: Modifica un activo 
       description: Modifica un activo específico del recurso genérico.

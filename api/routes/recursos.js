@@ -179,7 +179,7 @@ router.get('/:idRecurso', async function (req, res, next) {
   if (admin) {
     // 1. Obtenemos página y offset
     const page = Math.max(1, req.query.page);             // La página debe ser mayor que 1, para que cuando se calcule el offset sea mayor o igual que 0
-    const page_size = Math.min(req.params.page_size, process.env.MAX_PAGE_SIZE);  // El tamaño de página debe ser menor o igual que MAX_PAGE_SIZE
+    const page_size = Math.min(req.query.page_size, process.env.MAX_PAGE_SIZE);  // El tamaño de página debe ser menor o igual que MAX_PAGE_SIZE
     const offset = (page - 1) * page_size;                // El se calcula como (página - 1) * tamaño_página, para que la página 1 se corresponda a los
                                                           // primeros resultados [0, n)
 
@@ -187,25 +187,40 @@ router.get('/:idRecurso', async function (req, res, next) {
     const resource = req.params.idRecurso;
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
-    const mongoResponse = await db.collection(resource)
+    const cursor = await db.collection(resource)
       .find()
       .limit(page_size)
       .skip(offset)
 
-    if (mongoResponse) {
+    if (cursor) {
       // Si recurso existe, da formato a la respuesta
-      const activos = [];
-      const ocurrencias = [];
-      mongoResponse.ocurrencias.forEach(o => {
-        ocurrencias.push({
-          timestamp: o.timestamp,
-          source: o.source
+      const assets = [];
+
+      // Recorre todos los activos de la página y los traduce a objectos de la aplicación
+      while (await cursor.hasNext()) {
+        const asset = await cursor.next();
+
+        // Obtiene la lista de ocurrencias del activo
+        const ocurrencias = [];
+        asset.ocurrencias.forEach(o => {
+          ocurrencias.push({
+            timestamp: o.timestamp,
+            source: o.source
+          });
         });
-      });
+
+        // Añade el activo a la lista de activos
+        assets.push(
+          {
+            id: asset._id,
+            ocurrencias
+          }
+        );
+      }
 
       const response = {
-        activos,
-        next: `/recursos/${resource}?${page + 1}&${page_size}`
+        activos: assets,
+        next: `/recursos/${resource}?page=${page + 1}&page_size=${page_size}`
       };
       sendResponse(res, 200, response);
     } else {
@@ -243,19 +258,18 @@ router.get('/:idRecurso/:idActivo', async function (req, res, next) {
   }
 });
 
-router.post('/:idRecurso/:idActivo', async function (req, res, next) {
+router.post('/:idRecurso', async function (req, res, next) {
   const admin = checkAdmin(req, res);
   if (admin) {
-    const databaseManager = Database.getInstance();
-    const db = databaseManager.client.db("scrapiffy");
+    const data = await getContent(req, res, "assetSchema");
+    if (data) {
+      const databaseManager = Database.getInstance();
+      const db = databaseManager.client.db("scrapiffy");
 
-    const collections = await db.collections();
-    const resources = collections.map(c => c.s.namespace.collection);
-    const resourceExists = resources.includes(req.params.idRecurso);
-
-    if (resourceExists) {
-      const data = await getContent(req, res, "assetSchema");
-      if (data) {
+      const collections = await db.collections();
+      const resources = collections.map(c => c.s.namespace.collection);
+      const resourceExists = resources.includes(req.params.idRecurso);
+      if (resourceExists) {
         // 2. Añadir en mongo recurso
         try {
           const mongoResponse = await db.collection(req.params.idRecurso).insertOne({
@@ -271,10 +285,10 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
         } catch {
           sendResponse(res, 400, 'El id ya existe');
         }
+      } else {
+        sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
       }
-    } else {
-      sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
-    }
+    } 
   }
 });
 
