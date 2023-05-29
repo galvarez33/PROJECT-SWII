@@ -7,6 +7,8 @@ const router = express.Router();
 const { Database } = require("../scripts/database");
 const { XMLParser, XMLBuilder, XMLValidator } = require("fast-xml-parser");
 const parser = new XMLParser()
+const http = require("http");
+const axios = require('axios');
 
 
 // Load schema beforehand
@@ -50,7 +52,7 @@ router.get('/', async function (req, res, next) {
 router.post('/', async function (req, res, next) {
   const admin = true //checkAdmin(req, res);
   if (admin) {
-    const data = getContent(req, res, "resource")
+    const data = await getContent(req, res, "resource")
     if (data) {
       // 2. Añadir en mongo recurso
       const databaseManager = Database.getInstance();
@@ -149,21 +151,32 @@ function sendResponse(res, statusCode, response) {
   res.send(response);
 }
 
-function getContent(req, res, validator) {
+async function getContent(req, res, validator) {
   let data = '';
 
   if (req.is("application/x-www-form-urlencoded")) {
-    const body = Object.keys(req.body)[0];
-    data = parser.parse(body).content;
+    try {
+      const body = Object.keys(req.body)[0];
+      const config = {
+        headers: {
+          'Content-Type': 'application/xml'
+        }
+      }
+      const response = await axios.post(process.env.DTD_SERVICE_URL + "/" + validator, body, config);
+      data = parser.parse(body).content;
+      return data;
+    } catch {
+      sendResponse(res, 400, "Formato incorrecto");
+    }
   } else if (req.is("application/json")) {
     data = req.body;
+    const valid = validateSchema(validator, data, res);
+    return valid ? data : null;
   } else {
     sendResponse(res, 400, "Formato incorrecto");
   }
-  console.log(data)
+  //console.log(data)
 
-  const valid = validateSchema(validator, data, res);
-  return valid ? data : null;
 }
 
 router.get('/:idRecurso/:idActivo', async function (req, res, next) {
