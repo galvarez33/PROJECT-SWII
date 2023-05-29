@@ -65,6 +65,11 @@ paths:
   /recursos/{idRecurso}:
     parameters:
       - $ref: "#/components/parameters/idRecurso"
+    get:
+      summary: Obtiene todos los activos del recurso
+      description: | 
+        Recupera una todos los activos asociados a un recurso. Implementa paginación. 
+        Requiere ser admin.
     put:
       summary: Modifica un recurso
       description: Modifica un recurso de la lista de recursos disponibles
@@ -174,8 +179,6 @@ paths:
               ocurrencias:
                 - timestamp: "02/03/2022"
                   source: "www.ejemplo.es"
-              
-            
       responses:
         "201":
           description: Created

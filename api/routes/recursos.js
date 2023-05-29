@@ -20,13 +20,6 @@ ajv.addSchema(resourcePutSchema, "resourcePut");
 ajv.addSchema(assetSchema, "assetSchema");
 ajv.addSchema(assetPutSchema, "assetPutSchema");
 
-const dtds = {
-  resource: "../schemas/resource.dtd",
-  resourcePut: "../schemas/resourcePut.dtd",
-  assetSchema: "../schemas/asset.dtd",
-  assetPutSchema: "../schemas/assetPutSchema.dtd"
-}
-
 /** GET: Method to get list of resources  */
 router.get('/', async function (req, res, next) {
   // 1. Consulta a mongo -> recursos
@@ -50,7 +43,7 @@ router.get('/', async function (req, res, next) {
 });
 
 router.post('/', async function (req, res, next) {
-  const admin = true //checkAdmin(req, res);
+  const admin = checkAdmin(req, res);
   if (admin) {
     const data = await getContent(req, res, "resource")
     if (data) {
@@ -102,8 +95,7 @@ router.put('/:idRecurso', async function (req, res, next) {
 });
 
 router.delete('/:idRecurso', async function (req, res, next) {
-  //const admin = checkAdmin(req, res);
-  const admin = true;
+  const admin = checkAdmin(req, res);
   if (admin) {
     // 2. Añadir en mongo recurso
     const databaseManager = Database.getInstance();
@@ -120,7 +112,7 @@ router.delete('/:idRecurso', async function (req, res, next) {
 });
 
 function checkAdmin(req, res) {
-  if (req.user && req.user.admin) {
+  if (req.session.user && req.session.user.admin) {
     return true;
   }
   else {
@@ -209,7 +201,7 @@ router.get('/:idRecurso/:idActivo', async function (req, res, next) {
 });
 
 router.post('/:idRecurso/:idActivo', async function (req, res, next) {
-  const admin = true;//checkAdmin(req, res);
+  const admin = checkAdmin(req, res);
   if (admin) {
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
@@ -244,7 +236,7 @@ router.post('/:idRecurso/:idActivo', async function (req, res, next) {
 });
 
 router.put('/:idRecurso/:idActivo', async function (req, res, next) {
-  const admin = true;//checkAdmin(req, res);
+  const admin = checkAdmin(req, res);
   if (admin) {
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
@@ -276,7 +268,7 @@ router.put('/:idRecurso/:idActivo', async function (req, res, next) {
 });
 
 router.delete('/:idRecurso/:idActivo', async function (req, res, next) {
-  const admin = true;//checkAdmin(req, res);
+  const admin = checkAdmin(req, res);
   if (admin) {
     const databaseManager = Database.getInstance();
     const db = databaseManager.client.db("scrapiffy");
@@ -297,7 +289,6 @@ router.delete('/:idRecurso/:idActivo', async function (req, res, next) {
     } else {
       sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
     }
-
   }
 });
 
