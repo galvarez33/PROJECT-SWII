@@ -170,8 +170,6 @@ async function getContent(req, res, validator) {
   } else {
     sendResponse(res, 400, "Formato incorrecto");
   }
-  //console.log(data)
-
 }
 
 /** GET: Method to get list of resources  */
@@ -227,7 +225,6 @@ router.get('/:idRecurso/:idActivo', async function (req, res, next) {
   const mongoResponse = await db.collection(resource).findOne({ _id: asset });
 
   if (mongoResponse) {
-    console.log(mongoResponse)
     const ocurrencias = [];
     mongoResponse.ocurrencias.forEach(o => {
       ocurrencias.push({
