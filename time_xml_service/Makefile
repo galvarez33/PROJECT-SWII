@@ -7,4 +7,4 @@ start:
 	@bundle exec ruby lib/routes.rb
 
 clean:
-	@rm -rf ./gems
+	@rm -rf ./.gems
