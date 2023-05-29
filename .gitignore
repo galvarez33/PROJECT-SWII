@@ -105,3 +105,6 @@ dist
 
 # Ignore custom environment files
 config_tests.sh
+
+# Ignore local gem file
+**/.gems
