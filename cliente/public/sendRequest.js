@@ -1,6 +1,6 @@
 async function senderRequest() {
     const respuesta = document.getElementById("respuesta");
-    respuesta.innerHTML="Respuesta"
+    respuesta.innerHTML="Respuesta:"
     try {
         const elemento = document.getElementById("search-input").value;
         let recurso = document.getElementById("recursos").value;
