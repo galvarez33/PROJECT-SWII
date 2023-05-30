@@ -12,10 +12,18 @@ const updateService = require('./scripts/scrapiffy_integration');
  * @returns {Promise}
  */
 async function main() {
-  const pasteBinUrls = await getTargetUrls();
+  // Get paste bin urls to interesting pastes
+  const keywords = ['phone', 'email', 'gmail', 'phone numbers'];
+  const pasteBinUrls = await getTargetUrls(keywords);
+
+  // Scrape previously obtained urls
   const matches = await scrapePasteBin(pasteBinUrls);
-  updateService(matches);
+  console.log(matches)
+  throw new Error()
+
+  // Update scrapiffy
+  await updateService(matches);
 }
 
 // Run main function
-(async() => await main());
+(async() => await main())();

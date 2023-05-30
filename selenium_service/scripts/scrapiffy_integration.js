@@ -22,9 +22,9 @@ async function updateService(matches) {
     await login(client);
 
     // Insert or update matches
-    Object.keys(matches).forEach(async (resource) => {
+    for (resource of Object.keys(matches)) {
       await updateResource(client, resource, matches[resource]);
-    });
+    }
     } catch {
     console.error('Could not update service');
   }

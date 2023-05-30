@@ -9,12 +9,13 @@ const { URLMatcher } = require('./matchers');
  */
 async function getTargetUrls(keywords) {
   const pasteBinUrls = [];
-  keywords.forEach(async (keyword) => {
-    const pageSource = await makeAPIRequest(keyword);
-    const extractedUrls = extractPastBinUrls(pageSource);
 
-    pasteBinUrls.push(extractedUrls);
-  });
+  for (let keyword of keywords) {
+    const response = await makeAPIRequest(keyword);
+    const extractedUrls = extractPastBinUrls(response);
+
+    pasteBinUrls.push(...extractedUrls);
+  }
 
   return pasteBinUrls;
 }
@@ -28,21 +29,15 @@ async function getTargetUrls(keywords) {
 async function makeAPIRequest(keyword) {
   // Build google query -> format keyword to replace spaces with +
   const formatedKeyword = `"${keyword.replace(' ', '+')}"`;""
-  const googleQuery = `https://www.google.com/search?q=site:pastebin.com+${formatedKeyword}`;
-  const encodedQuery = encodeURIComponent(googleQuery);
+  const apiQuery = `${process.env.API_URI}&q=site%3Apastebin.com+${formatedKeyword}&api_key=${process.env.API_KEY}`;
 
   try {
     // Make API request
-    const response = await axios.get(process.env.SCRAPING_ANT_URI, {
-      params: {
-        url: encodedQuery,
-        "x-api-key": process.env.SCRAPING_ANT_KEY
-      }
-    });
+    const response = await axios.get(apiQuery);
 
     // Return request body
-    response.data;
-  } catch {
+    return response.data;
+  } catch(error) {
     return '';
   }
 }
@@ -50,15 +45,14 @@ async function makeAPIRequest(keyword) {
 /**
  * Function that extracts all PastBin URLs from a document. 
  * 
- * @param {String} pageSource HTML source to extract pasteBin URLs from.
+ * @param {Object} response JSON API's response.
  */
-function extractPastBinUrls(pageSource) {
+function extractPastBinUrls(response) {
   // Get urls from document
-  const matcher = new URLMatcher();
-  const urls = matcher.getMatches(pageSource);
+  const urls = response.organic_results.map(r => r.link);
 
   // Filter out non-pastebin urls
-  urls.filter(url => url.includes('pastebin.com/'));
+  return urls.filter(url => url.includes('pastebin.com/'));
 }
 
 module.exports = getTargetUrls;

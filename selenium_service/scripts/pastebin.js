@@ -106,7 +106,7 @@ class Resources {
 async function scrapePasteBin(pasteBinUrls) {
   const resources = new Resources();
 
-  pasteBinUrls.forEach(async (url) => {
+  for (let url of pasteBinUrls) {
     const urlMatches = await scrapeUrl(url);
 
     urlMatches.emails.forEach(email => {
@@ -115,9 +115,9 @@ async function scrapePasteBin(pasteBinUrls) {
     urlMatches.telefonos.forEach(phone => {
       resources.addPhone(phone, url);
     });
-  });
+  }
 
-  return matches.toObject();
+  return resources.toObject();
 }
 
 /**
@@ -132,18 +132,23 @@ async function scrapeUrl(url) {
     emails: [],
     telefonos: []
   };
+  console.log(url)
 
   try {
     // Get web page
-    const pageSource = await axios.get(url);
+    const response = await axios.get(url);
+    const pageSource = response.data;
 
     // Scrape web page
     const emails = new EmailMatcher().getMatches(pageSource);
-    matches.emails.concat(emails);
+    matches.emails.push(...emails);
 
     const telefonos = new PhoneMatcher().getMatches(pageSource);
-    matches.telefonos.concat(telefonos);
-  } finally {
+    matches.telefonos.push(...telefonos);
+  } catch(error) {
+    //console.log(error)
+  }   
+  finally {
     return matches;
   }
 }
