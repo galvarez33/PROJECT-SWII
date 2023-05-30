@@ -1,5 +1,6 @@
 async function senderRequest() {
     try {
+        document.getElementById("res").style.color = "#28ad52"
         const elemento = document.getElementById("search-input").value;
         let recurso = document.getElementById("recursos").value;
         if (recurso == "default"){
