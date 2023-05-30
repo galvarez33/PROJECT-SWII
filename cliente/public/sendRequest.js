@@ -1,9 +1,20 @@
-async function  senderRequest(){
-    const elemento = document.getElementById("search-input").value;
-    let response = await axios("http://localhost:3000/recursos/emails/" + elemento);
+async function senderRequest() {
+    try {
+        const elemento = document.getElementById("search-input").value;
+        let recurso = document.getElementById("recursos").value;
+        if (recurso == "default"){
+            alert("Selccione un recurso")
+            return
+        }
+        let response = await axios("http://localhost:3000/recursos/" + recurso + "/" + elemento)
+        const res = document.getElementById('res');
 
-    const res = document.getElementById('res');
-
-    res.innerHTML = JSON.stringify(response.data);
+        if (response.data) {
+            document.getElementById("res").style.color = "#a82c2c";
+            res.innerHTML = JSON.stringify(response.data);
+        }
+    } catch {
+        res.innerHTML = ("ENHORABUENA, No se ha encontrado ninguna ocurrencia.")
+    };
 }
 
