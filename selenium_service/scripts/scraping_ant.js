@@ -29,7 +29,7 @@ async function getTargetUrls(keywords) {
 async function makeAPIRequest(keyword) {
   // Build google query -> format keyword to replace spaces with +
   const formatedKeyword = `"${keyword.replace(' ', '+')}"`;""
-  const apiQuery = `${process.env.API_URI}&q=site%3Apastebin.com+${formatedKeyword}&api_key=${process.env.API_KEY}`;
+  const apiQuery = `${process.env.API_URI}&q=${formatedKeyword}&api_key=${process.env.API_KEY}`;
 
   try {
     // Make API request
@@ -52,7 +52,8 @@ function extractPastBinUrls(response) {
   const urls = response.organic_results.map(r => r.link);
 
   // Filter out non-pastebin urls
-  return urls.filter(url => url.includes('pastebin.com/'));
+  //return urls.filter(url => url.includes('pastebin.com/'));
+  return urls;
 }
 
 module.exports = getTargetUrls;

@@ -13,13 +13,11 @@ const updateService = require('./scripts/scrapiffy_integration');
  */
 async function main() {
   // Get paste bin urls to interesting pastes
-  const keywords = ['phone', 'email', 'gmail', 'phone numbers'];
+  const keywords = ['phone', 'email', 'gmail', 'phone numbers', 'email leaks', 'gmail leaks', 'phone number leaks'];
   const pasteBinUrls = await getTargetUrls(keywords);
 
   // Scrape previously obtained urls
   const matches = await scrapePasteBin(pasteBinUrls);
-  console.log(matches)
-  throw new Error()
 
   // Update scrapiffy
   await updateService(matches);

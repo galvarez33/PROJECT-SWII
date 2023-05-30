@@ -1,10 +1,7 @@
 const axios = require('axios');
 const { wrapper } = require( 'axios-cookiejar-support');
 const { CookieJar } = require( 'tough-cookie');
-
-// Hacer post a login con ADMIN_TOKEN
-
-// Hacer resto de operaciones
+const {execSync} = require('child_process');
 
 /**
  * Function to add found matches to database.
@@ -50,13 +47,14 @@ async function login(client) {
  * @param {Array<Object>} assets List of assets to add/update.
  */
 async function updateResource(client, resource, assets) {
-  assets.forEach(async (asset) => {
+  for (let asset of assets) {
     try {
       await addAsset(client, resource, asset);
     } catch {
       await updateAsset(client, resource, asset);
     }
-  });
+    execSync('sleep 0.5');
+  }
 }
 
 /**
@@ -82,9 +80,10 @@ async function addAsset(client, resource, asset) {
 async function updateAsset(client, resource, asset) {
   const headers = { "Content-Type": "application/json" };
 
-  asset.ocurrencias.forEach(async (ocurrencia) => {
-    await client.put(`${process.env.SCRAPIFFY_URI}/recursos/${resource}/${asset.id}`, ocurrencia, headers);
-  });
+  for (let ocurrencia of asset.ocurrencias) {
+    const data = { ocurrencia };
+    await client.put(`${process.env.SCRAPIFFY_URI}/recursos/${resource}/${asset.id}`, data, headers);
+  }
 }
 
 module.exports = updateService;

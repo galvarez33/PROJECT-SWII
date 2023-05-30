@@ -132,7 +132,6 @@ async function scrapeUrl(url) {
     emails: [],
     telefonos: []
   };
-  console.log(url)
 
   try {
     // Get web page
