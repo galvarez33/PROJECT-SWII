@@ -16,14 +16,14 @@
     <br>
     <div class="d-flex justify-content-start">
       <select name="recursos" id="recursos">
+        <option value="default">Elegir Recurso</option>
         <option value="emails">Emails</option>
         <option value="telefono">Teléfono</option>
-        <option value="tarjeta">Tarjeta de Crédito</option>
       </select>
 
       <input type="text" id="search-input" class="form-control ml-2" placeholder="Buscar">
 
-      <button onclick="senderRequest()" type="submit" class="btn btn-secondary ml-2"
+      <button onclick="senderRequest()"  type="submit" class="btn btn-secondary ml-2"
         style="color:#DDE6ED">Enviar</button>
     </div>
     <br>
@@ -31,7 +31,7 @@
     <br>
     <div class="display-4" style="color: #9DB2BF">Respuesta:</div>
     <br>
-    <div id="res" style="color:rgb(255, 0, 0); font-size: x-large;"></div>
+    <div id="res" style="color:rgb(45, 176, 67); font-size: x-large;"></div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="/sendRequest.js"></script>
