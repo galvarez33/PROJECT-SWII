@@ -1,5 +1,11 @@
 # Scrapiffy
 
+Hecho por:
+- Pedro Bereilh
+- David Gilarranz
+- Pablo Muñoz
+- Gonzalo Álvarez
+
 ## ¿Qué es Scrapiffy?
 - Scrapiffy es una API que permite comprobar si el contenido introducido ha sido pasteado en internet​.
 
