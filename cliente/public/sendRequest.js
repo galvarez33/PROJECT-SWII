@@ -8,7 +8,7 @@ async function senderRequest() {
             alert("Selccione un recurso")
             return
         }
-        let response = await axios("http://localhost:3000/recursos/" + recurso + "/" + elemento);
+        let response = await axios(process.env.URI + recurso + "/" + elemento);
         const res = document.getElementById('res');
         const linky = document.getElementById('linky');
         const ruta = document.getElementById('ruta');
@@ -16,7 +16,7 @@ async function senderRequest() {
         if (response.data) {
             let tamaño = response.data.ocurrencias.length;
             document.getElementById("res").style.color = "#a82c2c";
-            let l = "http://localhost:3000/recursos/" + recurso + "/" + elemento;
+            let l = process.env.URI + recurso + "/" + elemento;
             res.innerHTML = "Hemos encontrado " + tamaño + " occurencia. Si quieres ver más información utilice la siguiente API: " + l;
             
         }
