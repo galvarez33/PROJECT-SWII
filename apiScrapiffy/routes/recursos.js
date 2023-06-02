@@ -178,10 +178,16 @@ router.get('/:idRecurso', async function (req, res, next) {
   const admin = checkAdmin(req, res);
   if (admin) {
     // 1. Obtenemos página y offset
-    const page = Math.max(1, req.query.page);             // La página debe ser mayor que 1, para que cuando se calcule el offset sea mayor o igual que 0
-    const page_size = Math.min(req.query.page_size, process.env.MAX_PAGE_SIZE);  // El tamaño de página debe ser menor o igual que MAX_PAGE_SIZE
+    const page = req.query.page ? Math.max(parseInt(req.query.page), 1) : 1;
+    //const page = Math.max(1, parseInt(req.query.page));             // La página debe ser mayor que 1, para que cuando se calcule el offset sea mayor o igual que 0
+    //const page_size = Math.min(parseInt(req.query.page_size), parseInt(process.env.MAX_PAGE_SIZE));  // El tamaño de página debe ser menor o igual que MAX_PAGE_SIZE
+    let page_size = 20;
+    if (req.query.page_size) {
+      page_size = Math.min(parseInt(req.query.page_size), 20);
+    }
     const offset = (page - 1) * page_size;                // El se calcula como (página - 1) * tamaño_página, para que la página 1 se corresponda a los
-                                                          // primeros resultados [0, n)
+    // primeros resultados [0, n)
+    console.log(page, page_size)
 
     // 1. Consulta a mongo -> Todos los activos asociados a un recurso (paginados)
     const resource = req.params.idRecurso;
@@ -198,24 +204,26 @@ router.get('/:idRecurso', async function (req, res, next) {
 
       // Recorre todos los activos de la página y los traduce a objectos de la aplicación
       while (await cursor.hasNext()) {
-        const asset = await cursor.next();
+        try {
+          const asset = await cursor.next();
 
-        // Obtiene la lista de ocurrencias del activo
-        const ocurrencias = [];
-        asset.ocurrencias.forEach(o => {
-          ocurrencias.push({
-            timestamp: o.timestamp,
-            source: o.source
+          // Obtiene la lista de ocurrencias del activo
+          const ocurrencias = [];
+          asset.ocurrencias.forEach(o => {
+            ocurrencias.push({
+              timestamp: o.timestamp,
+              source: o.source
+            });
           });
-        });
 
-        // Añade el activo a la lista de activos
-        assets.push(
-          {
-            id: asset._id,
-            ocurrencias
-          }
-        );
+          // Añade el activo a la lista de activos
+          assets.push(
+            {
+              id: asset._id,
+              ocurrencias
+            }
+          );
+        } catch { }
       }
 
       const response = {
@@ -288,7 +296,7 @@ router.post('/:idRecurso', async function (req, res, next) {
       } else {
         sendResponse(res, 404, `El recurso ${req.params.idRecurso} no existe`);
       }
-    } 
+    }
   }
 });
 
