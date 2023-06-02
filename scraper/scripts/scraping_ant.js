@@ -38,6 +38,7 @@ async function makeAPIRequest(keyword) {
     // Return request body
     return response.data;
   } catch(error) {
+    console.log(error)
     return '';
   }
 }
